@@ -5,7 +5,7 @@ then
  
    echo "
 
-Creates the PVC for k8s to use as Ceph 
+Creates the PVC for k8s. Ceph RBD as backend
 
 Usage:
 
