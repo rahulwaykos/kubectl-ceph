@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]
+then
+ 
+   echo "
+
+Creates the PVC for k8s to use as Ceph 
+
+Usage:
+
+  kubectl ceph create [name]
+  
+   name      Name for PVC to create
+     
+Flags:
+  -h, --help   help for kubectl ceph create  "
+   exit 0
+   
+ fi
+ 
+ if [[ -z "$1" ]] 
+ then
+   echo "No name provided"
+ fi 
+ 
+ if [[ "$1" =~ ^[A-Za-Z_] ]]
+ then
+   echo "PVC $1 created"
+ fi
