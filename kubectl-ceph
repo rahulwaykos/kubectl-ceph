@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# optional argument handling
+if [[ "$1" == "version" ]]
+then
+    echo "1.0.0"
+    exit 0
+fi
+
+# optional argument handling
+if [[ "$1" == "--help" | "$1" == "-h" ]]
+then
+    echo "
+Usage:
+  kubectl ceph [command]
+
+Available Commands:
+  init         Provisioning for k8s to use rbd
+  create       Creates PVC to use
+  validate     Validates the authorized configuration and keyring
+
+Flags:
+  -h, --help   help for kubectl ceph
+
+
+    exit 0
+fi
+
+echo "
+No arguments or command!!!
+
+Use 'kubectl ceph [command] --help' for more information about a command."
+
+"
