@@ -5,26 +5,30 @@ then
  
    echo "
 
-Creates the PVC for k8s. Ceph RBD as backend
+Validate command used to validate the ceph authorized configuration and keyring provided by ceph-cluster admin
 
 Usage:
 
-  kubectl ceph create [name]
+  kubectl ceph validate
   
-   name      Name for PVC to create
-     
 Flags:
   -h, --help   help for kubectl ceph create  "
    exit 0
    
  fi
  
- if [[ -z "$1" ]] 
+ if [[ -f /etc/ceph/ceph.* ]] 
  then
-   echo "No name provided"
+   echo "Validating Ceph conf and keyring in /etc/ceph......"
+   ceph -s > /dev/null
+   if [[ "$?" == "0" ]]
+   then
+     echo " Validation Successful...!"
+     echo -e "\n You can use kubectl ceph init command"
+   else
+     echo "Validation Failed!! Please check ceph.conf and keyring"
+ else
+   echo "No Files found in /etc/ceph"
  fi 
  
- if [[ "$1" =~ ^[A-Za-Z_] ]]
- then
-   echo "PVC $1 created"
- fi
+ 
