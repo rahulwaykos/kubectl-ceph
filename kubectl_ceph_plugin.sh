@@ -17,3 +17,4 @@ if [ ! -z "$YUM" ]; then
     rm ~/.ceph-plugin/kubectl_ceph_plugin.sh
     mv ~./ceph-plugin/ /usr/local/bin > /dev/null
 fi
+
