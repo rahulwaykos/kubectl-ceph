@@ -16,19 +16,41 @@ Flags:
    exit 0
    
  fi
- 
- if [[ -f /etc/ceph/ceph.* ]] 
- then
+
+progress-bar() {
+  local duration=${1}
+
+
+    already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
+    remaining() { for ((remain=$elapsed; remain<$duration; remain++)); do printf " "; done }
+    percentage() { printf "| %s%%" $(( (($elapsed)*100)/($duration)*100/100 )); }
+    clean_line() { printf "\r"; }
+
+  for (( elapsed=1; elapsed<=$duration; elapsed++ )); do
+      already_done; remaining; percentage
+      sleep 1
+      clean_line
+  done
+  clean_line
+}
+
+file="/etc/ceph/ceph.conf"
+file1="/etc/ceph/ceph.client.admin.keyring"
+
+if [[ -f "$file" ]] && [[ -f "$file1" ]] 
+then
    echo "Validating Ceph conf and keyring in /etc/ceph......"
-   ceph -s > /dev/null
-   if [[ "$?" == "0" ]]
-   then
-     echo " Validation Successful...!"
-     echo -e "\n You can use kubectl ceph init command"
-   else
-     echo "Validation Failed!! Please check ceph.conf and keyring"
- else
+   progress-bar 10
+   ceph -s > /dev/null 2>&1
+     if [[ "$?" == "0" ]]
+      then
+          echo " Validation Successful...!"
+          echo -e "\n You can use kubectl ceph init command"
+      else
+          echo "Validation Failed!! Please check ceph.conf and keyring"
+      fi
+else
    echo "No Files found in /etc/ceph"
- fi 
+fi 
  
  
