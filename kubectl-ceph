@@ -8,7 +8,7 @@ then
 fi
 
 # optional argument handling
-if [[ "$1" == "--help" | "$1" == "-h" ]]
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]
 then
     echo "
 Usage:
@@ -21,7 +21,7 @@ Available Commands:
 
 Flags:
   -h, --help   help for kubectl ceph
-
+"
 
     exit 0
 fi
@@ -29,6 +29,6 @@ fi
 echo "
 No arguments or command!!!
 
-Use 'kubectl ceph [command] --help' for more information about a command."
+Use 'kubectl ceph [command] --help' for more information about a command.
 
 "
