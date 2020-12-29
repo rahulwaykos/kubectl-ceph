@@ -5,26 +5,21 @@ then
  
    echo "
 
-Creates the PVC for k8s. Ceph RBD as backend
+Initialize Ceph RBD-Provisioner
 
+***Must validate ceph configuration before using this command***
+
+Check 'kubectl ceph validate -h' for details
+   
 Usage:
 
-  kubectl ceph create [name]
+  kubectl ceph init
   
-   name      Name for PVC to create
-     
+        
 Flags:
-  -h, --help   help for kubectl ceph create  "
+  -h, --help   help for kubectl ceph init  "
    exit 0
    
  fi
  
- if [[ -z "$1" ]] 
- then
-   echo "No name provided"
- fi 
- 
- if [[ "$1" =~ ^[A-Za-Z_] ]]
- then
-   echo "PVC $1 created"
- fi
+curl -s https://raw.githubusercontent.com/rahulwaykos/k8s-ceph/master/scripts/rbd-provisioner.sh | sh > /dev/null 2>&1
