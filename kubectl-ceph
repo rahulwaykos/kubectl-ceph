@@ -15,7 +15,7 @@ Usage:
   kubectl ceph [command]
 
 Available Commands:
-  init         Provisioning for k8s to use rbd
+  init         Provisioning for k8s to use rbd 
   create       Creates PVC to use
   validate     Validates the authorized configuration and keyring
 
