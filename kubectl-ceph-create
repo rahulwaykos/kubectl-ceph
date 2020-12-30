@@ -9,11 +9,12 @@ Creates the PVC for k8s. Ceph RBD as backend
 
 Usage:
 
-  kubectl ceph create -n [name] or
-  kubectl ceph create --name=[name]
+  kubectl ceph create -n [name] -s [size] or
+  kubectl ceph create --name=[name] --size=[size}
   
   name      Name for PVC to create
-     
+  size      Size in GB for pvc to claim
+  
 Flags:
   -h, --help   help for kubectl ceph create  "
    exit 0
@@ -38,16 +39,37 @@ case $key in
     shift
     fi
     ;;
-    
+    -s|--size=*)
+    if [[ "$key" == "-s" ]]; then
+    SIZE="$2"
+    shift # past argument
+    shift # past value
+    else
+    SIZE="${key#*=}"
+    shift
+    fi
+    ;;
 esac
 done
 set -- "${POSITIONAL[@]}"
 
-if [[ -z "$NAME" ]]
+if [[ -z "$NAME" ]] | [[ -z "$SIZE" ]]
 then
-    echo -e "    No valid option!! \n See 'kubectl ceph create --help for more details"
+    echo -e "    No valid option!! \n See 'kubectl ceph create --help' for more details"
 else
-   echo " pvc ${NAME}"
+cat <<EOF | kubectl apply -f -
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: ${NAME}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: ${SIZE}Gi
+  storageClassName: storage-rbd
+EOF
 fi
 
 
