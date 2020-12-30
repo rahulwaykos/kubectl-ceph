@@ -9,9 +9,10 @@ Creates the PVC for k8s. Ceph RBD as backend
 
 Usage:
 
-  kubectl ceph create [name]
+  kubectl ceph create -n [name] or
+  kubectl ceph create --name=[name]
   
-   name      Name for PVC to create
+  name      Name for PVC to create
      
 Flags:
   -h, --help   help for kubectl ceph create  "
@@ -19,12 +20,36 @@ Flags:
    
  fi
  
- if [[ -z "$1" ]] 
- then
-   echo "No name provided"
- fi 
  
- if [[ "$1" =~ ^[A-Za-Z_] ]]
- then
-   echo "PVC $1 created"
- fi
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -n|--name=*)
+    if [[ "$key" == "-n" ]]; then
+    NAME="$2"
+    shift # past argument
+    shift # past value
+    else
+    NAME="${key#*=}"
+    shift
+    fi
+    ;;
+    
+esac
+done
+set -- "${POSITIONAL[@]}"
+
+if [[ -z "$NAME" ]]
+then
+    echo -e "    No valid option!! \n See 'kubectl ceph create --help for more details"
+else
+   echo " pvc ${NAME}"
+fi
+
+
+
+
