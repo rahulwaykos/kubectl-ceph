@@ -34,6 +34,7 @@ progress-bar() {
   clean_line
 }
 
+validate () {
 file="/etc/ceph/ceph.conf"
 file1="/etc/ceph/ceph.client.admin.keyring"
 
@@ -53,4 +54,6 @@ else
    echo "No Files found in /etc/ceph"
 fi 
  
+ }
  
+ validate
