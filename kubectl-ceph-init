@@ -1,6 +1,5 @@
 #!/bin/bash
 
-source /usr/local/bin/kubectl-ceph-validate
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]
 then
  
@@ -40,17 +39,102 @@ progress-bar() {
   clean_line
 } 
 
-validate > /dev/null 2>&1
-if [[ "$?" == "1" ]]
-then
-  curl -s https://raw.githubusercontent.com/rahulwaykos/k8s-ceph/master/scripts/rbd-provisioner.sh | sh > /dev/null 2>&1
-  kubectl get pods -l app=rbd-provisioner -n kube-system
-  if [[ "$?" == "0" ]] 
-  then
-     echo -e "\nInitializing... Waiting for Pod to create"
-     progress-bar 35
-     echo -e "\n"
-   fi
 
-fi
+init () {
+file="/etc/ceph/ceph.conf"
+file1="/etc/ceph/ceph.client.admin.keyring"
+
+if [[ -f "$file" ]] && [[ -f "$file1" ]] 
+then
+   ceph -s > /dev/null 2>&1
+     if [[ "$?" == "0" ]]
+      then
+         curl -s https://raw.githubusercontent.com/rahulwaykos/k8s-ceph/master/scripts/rbd-provisioner.sh | sh > /dev/null 2>&1
+         kubectl get pods -l app=rbd-provisioner -n kube-system | grep Running > /dev/null
+        if [[ "$?" == "0" ]] 
+         then
+            echo -e "\nInitializing... Waiting for Pod to create"
+            progress-bar 35
+            echo -e "\n"
+            kubectl get pods -l app=rbd-provisioner -n kube-system 
+         fi
+      else
+          echo "Validation Failed!! Please check ceph.conf and keyring"
+      fi
+else
+   echo "No Files found in /etc/ceph"
+   exit 1
+fi 
+ 
+ }
+ 
+init
+
+mon=172.31.2.2
+mon1=172.31.25.23
+
+cat <<EOF > file.yml
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: storage-rbd
+provisioner: ceph.com/rbd
+parameters:
+  monitors: $mon:6789, $mon1:6789
+  adminId: admin
+  adminSecretName: ceph-secret
+  adminSecretNamespace: kube-system
+  pool: kubernetes
+  userId: admin
+  userSecretName: ceph-secret
+  userSecretNamespace: kube-system
+  imageFormat: "2"
+  imageFeatures: layering
+  
+EOF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
