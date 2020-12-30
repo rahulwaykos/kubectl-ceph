@@ -52,6 +52,7 @@ then
       fi
 else
    echo "No Files found in /etc/ceph"
+   exit 404
 fi 
  
  }
