@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source /usr/local/bin/kubectl-ceph-validate
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]
 then
  
@@ -39,16 +40,17 @@ progress-bar() {
   clean_line
 } 
 
-curl -s https://raw.githubusercontent.com/rahulwaykos/k8s-ceph/master/scripts/rbd-provisioner.sh | sh > /dev/null 2>&1
-
-
-kubectl get pods -l app=rbd-provisioner -n kube-system
-if [[ "$?" == "0" ]] 
+validate > /dev/null 2>&1
+if [[ "$?" == "1" ]]
 then
-echo -e "\nInitializing... Waiting for Pod to create"
-progress-bar 35
-echo -e "\n"
+  curl -s https://raw.githubusercontent.com/rahulwaykos/k8s-ceph/master/scripts/rbd-provisioner.sh | sh > /dev/null 2>&1
+  kubectl get pods -l app=rbd-provisioner -n kube-system
+  if [[ "$?" == "0" ]] 
+  then
+     echo -e "\nInitializing... Waiting for Pod to create"
+     progress-bar 35
+     echo -e "\n"
+   fi
+
 fi
-
-
 
