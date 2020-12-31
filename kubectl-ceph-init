@@ -76,6 +76,12 @@ esac
 done
 set -- "${POSITIONAL[@]}"
 
+rbd_feature() {
+rbd feature disable ${pool}/${image} deep-flatten
+rbd feature disable ${pool}/${image} fast-diff
+rbd feature disable ${pool}/${image} object-map
+}
+
 echo pool=$pool image=$image size=$size    $key       
 if [[ "$key" == "defaults" ]]
 then
@@ -88,9 +94,11 @@ fi
 systemctl enable rbdmap > /dev/null 2>&1
 if [[ "$?" == "0" ]] 
 then
+rbd_feature
 rbd map ${image} -p ${pool}
 else
 rm /etc/ceph/rbdmap
+rbd_feature
 systemctl enable rbdmap > /dev/null 2>&1
 rbd map ${image} -p ${pool}
 fi
