@@ -78,7 +78,10 @@ storage_class() {
 mon1=$(awk '/mon/ {print $4,$5}' ceph.conf | tail -1 | awk -F ',' '{print $2}')
 mon2=$(awk '/mon/ {print $4,$5}' ceph.conf | tail -1 | awk -F ',' '{print $1}')
 key=$(ceph --cluster ceph auth get-key client.admin)
-
+kubectl create secret generic ceph-secret \
+    --type="kubernetes.io/rbd" \
+    --from-literal=key=${key} \
+    --namespace=kube-system
 
 
 cat <<EOF > file.yml
