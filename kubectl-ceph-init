@@ -146,17 +146,35 @@ case $key in
     fi
     ;;
     --defaults)
-    pool=rbd
-    image=kube
-    size=2048
+    pool="rbd"
+    image="kube"
+    size="2048"
+    shift
     ;;
 esac
 done
 set -- "${POSITIONAL[@]}"
 
-echo $           
+echo pool=$pool image=$image size=$size    $key       
+if [[ "$key" == "defaults" ]]
+then
+rbd create ${image} --size ${size} -p ${pool} > /dev/null 2>&
+else
+ceph osd pool create ${pool} 100  > /dev/null 2>&1
+rbd create ${image} --size ${size} -p ${pool} > /dev/null 2>&1
+fi
 
-a
+systemctl enable rbdmap > /dev/null 2>&1
+if [[ "$?" == "0" ]] 
+then
+rbd map ${image} -p ${pool}
+else
+rm /etc/ceph/rbdmap
+systemctl enable rbdmap > /dev/null 2>&1
+rbd map ${image} -p ${pool}
+fi
+
+
 init
 
 
