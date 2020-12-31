@@ -40,6 +40,42 @@ progress-bar() {
 } 
 
 
+
+storage_class() {
+
+mon1=$(awk '/mon/ {print $4,$5}' ceph.conf | tail -1 | awk -F ',' '{print $2}')
+mon2=$(awk '/mon/ {print $4,$5}' ceph.conf | tail -1 | awk -F ',' '{print $1}')
+key=$(ceph --cluster ceph auth get-key client.admin)
+kubectl create secret generic ceph-secret \
+    --type="kubernetes.io/rbd" \
+    --from-literal=key=${key} \
+    --namespace=kube-system
+
+
+cat <<EOF > file.yml
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: storage-rbd
+provisioner: ceph.com/rbd
+parameters:
+  monitors: $mon1:6789, $mon2:6789
+  adminId: admin
+  adminSecretName: ceph-secret
+  adminSecretNamespace: kube-system
+  pool: rbd
+  userId: admin
+  userSecretName: ceph-secret
+  userSecretNamespace: kube-system
+  imageFormat: "2"
+  imageFeatures: layering
+  
+EOF
+
+}
+
+
 init () {
 file="/etc/ceph/ceph.conf"
 file1="/etc/ceph/ceph.client.admin.keyring"
@@ -71,48 +107,57 @@ fi
  
  }
  
+
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -p|--pool=*)
+    if [[ "$key" == "-p" ]]; then
+    pool="$2"
+    shift # past argument
+    shift # past value
+    else
+    pool="${key#*=}"
+    shift
+    fi
+    ;;
+    -i|--image=*)
+    if [[ "$key" == "-i" ]]; then
+    image="$2"
+    shift # past argument
+    shift # past value
+    else
+    image="${key#*=}"
+    shift
+    fi
+    ;;
+     -s|--size=*)
+    if [[ "$key" == "-s" ]]; then
+    size="$2"
+    shift # past argument
+    shift # past value
+    else
+    image="${key#*=}"
+    shift
+    fi
+    ;;
+    --defaults)
+    pool=rbd
+    image=kube
+    size=2048
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}"
+
+echo $           
+
+a
 init
-
-storage_class() {
-
-mon1=$(awk '/mon/ {print $4,$5}' ceph.conf | tail -1 | awk -F ',' '{print $2}')
-mon2=$(awk '/mon/ {print $4,$5}' ceph.conf | tail -1 | awk -F ',' '{print $1}')
-key=$(ceph --cluster ceph auth get-key client.admin)
-kubectl create secret generic ceph-secret \
-    --type="kubernetes.io/rbd" \
-    --from-literal=key=${key} \
-    --namespace=kube-system
-
-
-cat <<EOF > file.yml
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: storage-rbd
-provisioner: ceph.com/rbd
-parameters:
-  monitors: $mon1:6789, $mon2:6789
-  adminId: admin
-  adminSecretName: ceph-secret
-  adminSecretNamespace: kube-system
-  pool: kubernetes
-  userId: admin
-  userSecretName: ceph-secret
-  userSecretNamespace: kube-system
-  imageFormat: "2"
-  imageFeatures: layering
-  
-EOF
-
-}
-
-
-
-
-
-
-
 
 
 
