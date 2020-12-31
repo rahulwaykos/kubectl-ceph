@@ -120,7 +120,7 @@ kubectl create secret generic ceph-secret \
     --namespace=kube-system
 
 
-cat <<EOF > file.yml
+cat <<EOF | kubectl apply -f -
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
