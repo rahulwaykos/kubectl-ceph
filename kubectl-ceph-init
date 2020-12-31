@@ -13,8 +13,15 @@ Check 'kubectl ceph validate -h' for details
    
 Usage:
 
-  kubectl ceph init
-  
+  kubectl ceph init -p [pool] -i [image] -s [size]
+
+Options:
+
+--defaults                Default values pool=rbd image=kube size=2048
+-p | --pool=    pool      Ceph osd pool 
+-i | --iamge=   image     Image to create in pool
+-s | -size=     size      Size of image in pool 
+
         
 Flags:
   -h, --help   help for kubectl ceph init  "
