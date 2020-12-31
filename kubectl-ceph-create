@@ -57,7 +57,7 @@ if [[ -z "$NAME" ]] | [[ -z "$SIZE" ]]
 then
     echo -e "    No valid option!! \n See 'kubectl ceph create --help' for more details"
 else
-cat <<EOF | kubectl apply -f -
+cat <<EOF > pvc.yml
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
