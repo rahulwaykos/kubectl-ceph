@@ -79,7 +79,7 @@ set -- "${POSITIONAL[@]}"
 echo pool=$pool image=$image size=$size    $key       
 if [[ "$key" == "defaults" ]]
 then
-rbd create ${image} --size ${size} -p ${pool} > /dev/null 2>&
+rbd create ${image} --size ${size} -p ${pool} > /dev/null 2>&1
 else
 ceph osd pool create ${pool} 100  > /dev/null 2>&1
 rbd create ${image} --size ${size} -p ${pool} > /dev/null 2>&1
