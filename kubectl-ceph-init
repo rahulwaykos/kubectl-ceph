@@ -85,20 +85,23 @@ rbd feature disable ${pool}/${image} object-map
 echo pool=$pool image=$image size=$size    $key       
 if [[ "$key" == "defaults" ]]
 then
+ceph osd pool application enable ${pool} rbd --yes-i-really-mean-it
 rbd create ${image} --size ${size} -p ${pool} > /dev/null 2>&1
+rbd_feature
 else
 ceph osd pool create ${pool} 100  > /dev/null 2>&1
+ceph osd pool application enable ${pool}  rbd --yes-i-really-mean-it
 rbd create ${image} --size ${size} -p ${pool} > /dev/null 2>&1
+rbd_feature
 fi
 
 systemctl enable rbdmap > /dev/null 2>&1
 if [[ "$?" == "0" ]] 
 then
-rbd_feature
+
 rbd map ${image} -p ${pool}
 else
 rm /etc/ceph/rbdmap
-rbd_feature
 systemctl enable rbdmap > /dev/null 2>&1
 rbd map ${image} -p ${pool}
 fi
